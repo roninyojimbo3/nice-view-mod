@@ -132,46 +132,55 @@ static void draw_middle(lv_obj_t *widget, lv_color_t cbuf[], const struct status
     init_arc_dsc(&arc_dsc, LVGL_FOREGROUND, 2);
 
     lv_draw_arc_dsc_t arc_dsc_filled;
-    init_arc_dsc(&arc_dsc_filled, LVGL_FOREGROUND, 7);
+    init_arc_dsc(&arc_dsc_filled, LVGL_FOREGROUND, 5);
 
+    /*
+     * Use the compact font already enabled elsewhere in this status widget.
+     * It keeps all ten profile numbers readable, including profile 10.
+     */
     lv_draw_label_dsc_t label_dsc;
-    init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
+    init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
 
     lv_draw_label_dsc_t label_dsc_black;
-    init_label_dsc(&label_dsc_black, LVGL_BACKGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
+    init_label_dsc(&label_dsc_black, LVGL_BACKGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
 
     // Fill background
     lv_canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE, &rect_black_dsc);
 
-    // Eight Bluetooth profile indicators in two columns of four.
-    // Physical display after rotation:
-    //   1   5
-    //   2   6
-    //   3   7
-    //   4   8
-    int circle_offsets[8][2] = {
-        {13, 9},  {13, 25}, {13, 41}, {13, 57},
-        {54, 9},  {54, 25}, {54, 41}, {54, 57},
+    /*
+     * Ten Bluetooth profile indicators in two columns of five.
+     *
+     * Physical display after rotation:
+     *
+     *   1    6
+     *   2    7
+     *   3    8
+     *   4    9
+     *   5   10
+     */
+    int circle_offsets[10][2] = {
+        {13, 7}, {13, 20}, {13, 33}, {13, 46}, {13, 59},
+        {54, 7}, {54, 20}, {54, 33}, {54, 46}, {54, 59},
     };
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 10; i++) {
         bool selected = i == state->active_profile_index;
 
         lv_canvas_draw_arc(canvas, circle_offsets[i][0], circle_offsets[i][1],
-                           9, 0, 360, &arc_dsc);
+                           7, 0, 360, &arc_dsc);
 
         if (selected) {
             lv_canvas_draw_arc(canvas, circle_offsets[i][0], circle_offsets[i][1],
-                               7, 0, 359, &arc_dsc_filled);
+                               5, 0, 359, &arc_dsc_filled);
         }
 
-        char label[2];
+        char label[3];
         snprintf(label, sizeof(label), "%d", i + 1);
 
         lv_canvas_draw_text(canvas,
-                            circle_offsets[i][0] - 7,
-                            circle_offsets[i][1] - 8,
-                            14,
+                            circle_offsets[i][0] - 8,
+                            circle_offsets[i][1] - 4,
+                            16,
                             selected ? &label_dsc_black : &label_dsc,
                             label);
     }
